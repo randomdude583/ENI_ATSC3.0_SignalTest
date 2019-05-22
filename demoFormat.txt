@@ -1,0 +1,42 @@
+Frequency:
+TimeStamp:
+Location:
+#Readings:
+
+Bitrate
+	Max:
+	Min:
+	Avg: 
+
+SNR
+	Max:
+	Min:
+	Avg:
+
+RSSI
+	Max:
+	Min:
+	Avg:
+
+Signal Quality
+	Max:
+	Min:
+	Avg:
+
+Packet Loss
+	Max:
+	Min:
+	Avg:
+
+
+
+Results:
+-----------------------------------------------------------------
+TimeStamp:
+Bitrate:
+SNR:
+RSSI:
+Signal Quality:
+Packet Loss:
+
+-----------------------------------------------------------------
