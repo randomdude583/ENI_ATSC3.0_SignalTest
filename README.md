@@ -5,6 +5,7 @@ Written by Alex Collette for Edge Networks
 
 
 ########### USAGE ###########
+
 To run the program, navigate to its folder and run the command "py SignalDataCollector.py"
 The program will prompt you for frequency. Enter the frequency and press Enter.
 The program will prompt you for location. Enter the test location and press Enter.
