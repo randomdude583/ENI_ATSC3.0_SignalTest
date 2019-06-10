@@ -23,14 +23,18 @@ import smtplib, ssl
 import re
 import datetime
 import os
-from time import gmtime, strftime
+import time
+import subprocess
+import ctypes, sys
+
+
 
 
 
 
 ##  Init Variables  ##
 recordTime = 300   # Time to run(Seconds)
-interval = 5       # Time between recordings
+interval = 5       # Time between recordings(Seconds)
 
 ##  Storage Variables  ##
 startTime = 0     # Time the program was started
@@ -41,7 +45,7 @@ bitrate = 0       # Signal bitrate
 snr = 0           # Signal to noise ratio
 rssi = 0          # Signal Strength
 snq = 0           # Signal Quality
-packetLoss = 0    # Packets loss
+packetLoss = 0    # Packets lost 
 
 fileName = ""     # Target filename for storing data. This is generated programatically.
 
@@ -49,6 +53,17 @@ fileName = ""     # Target filename for storing data. This is generated programa
 
 
 
+######################  Check for admin  ######################
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+if not is_admin():
+	print("NOT ADMIN, RESTARTING!!")
+	ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+	exit()
 
 
 
@@ -58,10 +73,36 @@ fileName = ""     # Target filename for storing data. This is generated programa
 
 
 ######################   Start Program   ##################
+
+
+#Prompt User for Location
+location = input("Enter location of test: ")
+frequency = input("Enter frequency to monitor(MHz): ")
+print("\n")
+print("Interval: " + str(interval))
+print("Duration: " + str(recordTime))
+
+
+
+
 currentDT = datetime.datetime.now()
 startTime = str(currentDT.strftime("%Y-%m-%d %H:%M:%S"))
 formatted = str(currentDT.strftime("%Y-%m-%d_%H%M"))
-fileName = location + "_" + formatted + "_TEST"".txt"
+fileName = location + "_" + formatted + "_TEST3.0"".txt"
+
+print("Saving Data to " + fileName)
+
+
+
+
+
+
+
+####################  Initialize StreamScope  ####################
+def initScope():
+
+	#Run streamscope in a new terminal window
+	p = subprocess.Popen([os.path.expanduser('C:\\Program Files\\Triveni\\StreamScope XM Verifier\\ServerProcess.exe')], creationflags=subprocess.CREATE_NEW_CONSOLE)
 
 
 
@@ -71,13 +112,28 @@ fileName = location + "_" + formatted + "_TEST"".txt"
 
 
 
-#########################   Scrape Data    ####################
-def scrapeData():
 
-	# Initialize Soup
-	url = "localhost"
-	page = requests.get(url)
-	soup = BeautifulSoup(page.content, 'lxml')
+
+
+
+#########################   Run Test    ######################
+def runTest(fq):
+	global bitrate 
+	global snr
+	global rssi
+	global snq
+	global packetLoss
+
+
+	bitrate = 343
+
+
+	#Initialize soup 
+	#url = "localhost"
+	#page = requests.get(url)
+	#soup = BeautifulSoup(page.content, 'lxml')
+
+	
 
 
 
@@ -271,6 +327,34 @@ def writeFile(bitrate, snr, rssi, snq, packetLoss):
 	except:
 		pass
 	os.rename('tempfile.txt', fileName)
+
+
+
+
+
+#######################    Main    #######################
+
+#TEST
+initScope()
+
+
+#Calculate number of loops
+laps = recordTime/interval
+
+for i in range(int(laps)):
+	#run Test
+	runTest(frequency)
+
+	readingsTaken += 1
+	writeFile(bitrate, snr, rssi, snq, packetLoss)
+
+	#Update terminal
+	eta = (laps - i) * interval
+	print("                                                                                             ", end="\r")
+	print("Test " + str(i) + "/" + str(int(laps)) + "   ETA: " + str(int(int(eta)/60)) + " Minutes " + str(int(int(eta)%60)) + " Seconds", end="\r")
+
+	time.sleep(interval)
+
 
 readingsTaken = readingsTaken+1  #TODO: Remove this line, will be replaced by an incrementer in the scrape section
 writeFile(10, 20, 14, 17, 12)
