@@ -26,6 +26,8 @@ import os
 import time
 import subprocess
 import ctypes, sys
+import requests
+import time
 
 
 
@@ -104,6 +106,25 @@ def initScope():
 	#Run streamscope in a new terminal window
 	p = subprocess.Popen([os.path.expanduser('C:\\Program Files\\Triveni\\StreamScope XM Verifier\\ServerProcess.exe')], creationflags=subprocess.CREATE_NEW_CONSOLE)
 
+	active = False
+
+	while not active:
+		try:
+			url = "http://localhost"
+			page = requests.get(url)
+			soup = BeautifulSoup(page.content, 'lxml')
+			active = True
+		except:
+			timeLeft = 5
+			while timeLeft > 0:
+				print("StreamScope not ready, trying again in " + str(timeLeft) + " seconds.", end="\r")
+				timeLeft -= 1
+				time.sleep(1)
+				active = False
+
+print("                                                                                                ", end="\r")
+print("StreamScope Ready, Starting Tests  \n-- DO NOT CLOSE THE WEBPAGE THAT OPENS -- \n")
+
 
 
 
@@ -128,10 +149,10 @@ def runTest(fq):
 	bitrate = 343
 
 
-	#Initialize soup 
-	#url = "localhost"
-	#page = requests.get(url)
-	#soup = BeautifulSoup(page.content, 'lxml')
+	#Initialize BeautifulSoup and connect to page
+	url = "http://localhost"
+	page = requests.get(url)
+	soup = BeautifulSoup(page.content, 'lxml')
 
 	
 
